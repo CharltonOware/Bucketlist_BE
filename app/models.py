@@ -31,6 +31,29 @@ class UserModel(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password, password)
 
+    @classmethod
+    def find_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
+
+    @classmethod
+    def return_all(cls):
+        def to_json(x):
+            return {
+                'email': x.email,
+                'password': x.password
+            }
+        return {'users': list(map(lambda x: to_json(x), UserModel.query.all()))}
+
+    @classmethod
+    def delete_all(cls):
+        try:
+            num_rows_deleted = db.session.query(cls).delete()
+            db.session.commit()
+            return {'message': f'{num_rows_deleted} row(s) deleted'}
+        except:
+            return {'message': 'Something went wrong'}
+
+
 #Define BucketList Model
 class BucketList(db.Model):
     '''Table to store our bucketlists.'''
