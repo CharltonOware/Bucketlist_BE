@@ -53,6 +53,9 @@ class UserModel(db.Model):
         except:
             return {'message': 'Something went wrong'}
 
+    def __repr__(self):
+        return f"<UserModel: {self.email}>"
+
 
 #Define BucketList Model
 class BucketList(db.Model):
@@ -74,3 +77,19 @@ class BucketList(db.Model):
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
+
+    @classmethod
+    def find_by_name(cls, name):
+        return cls.query.filter_by(name=name).first()
+
+    @staticmethod
+    def get_all(user_id):
+        """This method gets all the bucketlists for a given user."""
+        return BucketList.query.filter_by(created_by=user_id)
+
+    def delete(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def __repr__(self):
+        return f"<BucketList: {self.name}>"
