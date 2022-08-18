@@ -42,7 +42,7 @@ class UserModel(db.Model):
                 'email': x.email,
                 'password': x.password
             }
-        return {'users': list(map(lambda x: to_json(x), UserModel.query.all()))}
+        return {'users': list(map(lambda x: to_json(x), cls.query.all()))}
 
     @classmethod
     def delete_all(cls):
