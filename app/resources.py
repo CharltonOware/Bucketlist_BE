@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask_apispec import marshal_with, use_kwargs, MethodResource
-from models import db, UserModel,BucketList
+from app.models import UserModel,BucketList
 from app.schema import UserResponseSchema, ItemResponseSchema
 
 
