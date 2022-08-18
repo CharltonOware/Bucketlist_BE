@@ -38,7 +38,7 @@ class UserLogin(MethodResource, Resource):
         if current_user.verify_password(kwargs['password']):
             return {'message': f'Logged in as {current_user.email}'}, 200
 
-#Define view for all user
+#Define view for all users
 class AllUsers(MethodResource, Resource):
     def get(self):
         return UserModel.return_all()
@@ -46,12 +46,12 @@ class AllUsers(MethodResource, Resource):
     def delete(self):
         return UserModel.delete_all()
 
-#Define BucketListAPI resource for viewing and creating/updating bucketlists
+#Define BucketListAPI resource for viewing and creating
 class BucketListAPI(MethodResource, Resource):
     @marshal_with(ItemResponseSchema(many=True), code=200)
     def get(self):
         """Get all bucketlist items created by the current user."""
-        bucketlist = BucketList.query.all()
+        bucketlist = BucketList.query.order_by(BucketList.id).all()
         return bucketlist
 
     @use_kwargs(ItemResponseSchema(), location='json')
@@ -64,7 +64,43 @@ class BucketListAPI(MethodResource, Resource):
             if BucketList.find_by_name(name):
                 return {'message': f'An item with the name {name} already exists.'}
             bucketlist = BucketList(name=name, created_by='Placeholder')
-            bucketlist.save_to_db()
-            return {'message': f'New item {name} created.'}
+            try:
+                bucketlist.save_to_db()
+                return {'message': f'New item {name} created.'}
+            except:
+                return {'message': 'Something went wrong.'}
         else:
-            return {'message': 'Something went wrong.'}
+            return {'message': 'Please provide all required data.'}
+
+#Define BucketListItemAPI that has show, update and delete capability implemented
+class BucketListItemAPI(MethodResource, Resource):
+    """"""   
+    @marshal_with(ItemResponseSchema, code=200)
+    def get(self, id):
+        """Get bucketlist item of the specified id."""
+        item = BucketList.query.filter_by(id=id).first_or_none()
+        if not item:
+            return {'message': f'Item {item.name} doesn\'t exist'}, 400
+        return item
+
+    @use_kwargs(ItemResponseSchema(), location='json')
+    @marshal_with(ItemResponseSchema(), code=200)
+    def patch(self, id, **kwargs):
+        """Update the specified Bucketlist item."""
+        item = BucketList.query.filter_by(id=id).first_or_none()
+        item.name = kwargs['name']
+        item.done = kwargs['done']
+        item.save_to_db()
+
+        return item
+
+    def delete(self, id):
+        """Delete the specified Bucketlist item."""
+        item = BucketList.query.filter_by(id=id).first_or_none()
+        if item:
+            item.delete()
+            return {'message': f'Item {item.id} deleted.'}, 204
+
+
+
+
