@@ -45,3 +45,26 @@ class AllUsers(MethodResource, Resource):
 
     def delete(self):
         return UserModel.delete_all()
+
+#Define BucketListAPI resource for viewing and creating/updating bucketlists
+class BucketListAPI(MethodResource, Resource):
+    @marshal_with(ItemResponseSchema(many=True), code=200)
+    def get(self):
+        """Get all bucketlist items created by the current user."""
+        bucketlist = BucketList.query.all()
+        return bucketlist
+
+    @use_kwargs(ItemResponseSchema(), location='json')
+    @marshal_with(ItemResponseSchema(), code=201)
+    def post(self, **kwargs):
+        name = kwargs['name']
+        #Confirm name is in the request parameters
+        if name:
+            #Abort if provided bucketlist name already exists for this user in the DB
+            if BucketList.find_by_name(name):
+                return {'message': f'An item with the name {name} already exists.'}
+            bucketlist = BucketList(name=name, created_by='Placeholder')
+            bucketlist.save_to_db()
+            return {'message': f'New item {name} created.'}
+        else:
+            return {'message': 'Something went wrong.'}
