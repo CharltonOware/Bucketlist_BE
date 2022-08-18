@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
+from flask_cors import CORS
 
 from config import app_config
 from app.models import db, UserModel, BucketList
@@ -17,6 +18,13 @@ db.init_app(app)
 migrate = Migrate(app, db)
 api = Api(app)
 
+#Enable CORS support
+CORS(app)
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization,true")
+    response.headers.add("Access-Control-Allow-Methods", "GET,PATCH,POST,DELETE,OPTIONS")
+    return response
 
 #Register endpoint inside our application
 api.add_resource(resources.UserRegistration, '/registration')
