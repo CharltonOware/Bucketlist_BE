@@ -80,7 +80,8 @@ class BucketList(db.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        return cls.query.filter_by(name=name).first()
+        #Return all bucketlist items with names matching the search name
+        return cls.query.order_by(cls.id).filter_by(cls.name.ilike('%{name}%')).first()
 
     @staticmethod
     def get_all(user_id):
