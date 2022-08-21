@@ -1,11 +1,11 @@
-from flask_restful import Resource
+from flask.views import MethodView
 from flask_apispec import marshal_with, use_kwargs, MethodResource, doc
 from app.models import UserModel,BucketList
 from app.schema import UserResponseSchema, ItemResponseSchema
 
 
 #Define UserRegistration endpoint
-class UserRegistration(MethodResource,Resource):
+class UserRegistration(MethodResource,MethodView):
     #Document API endpoint
     #@doc(description='Register User API.',tags=['Register'],responses=None)
     #Define fields
@@ -28,7 +28,7 @@ class UserRegistration(MethodResource,Resource):
         
 
 #Define UserLogin endpoint
-class UserLogin(MethodResource, Resource):
+class UserLogin(MethodResource, MethodView):
     #@doc(description='Login User API.',tags=['Login'],responses=None)
     @use_kwargs(UserResponseSchema(), location='json')
     @marshal_with(UserResponseSchema(), code=200)
@@ -43,7 +43,7 @@ class UserLogin(MethodResource, Resource):
             return {'message': f'Logged in as {current_user.email}'}, 200
 
 #Define view for all users
-class AllUsers(MethodResource, Resource):
+class AllUsers(MethodResource, MethodView):
     def get(self):
         return UserModel.return_all()
 
@@ -51,7 +51,7 @@ class AllUsers(MethodResource, Resource):
         return UserModel.delete_all()
 
 #Define BucketListAPI resource for viewing and creating
-class BucketListAPI(MethodResource, Resource):
+class BucketListAPI(MethodResource, MethodView):
     #@doc(description='Get Bucketlist Items API.',tags=['Display Bucketlist'],responses=None)
     @marshal_with(ItemResponseSchema(many=True), code=200)
     def get(self):
@@ -79,7 +79,7 @@ class BucketListAPI(MethodResource, Resource):
             return {'message': 'Please provide all required data.'}
 
 #Define BucketListItemAPI that has show, update and delete capability implemented
-class BucketListItemAPI(MethodResource, Resource):
+class BucketListItemAPI(MethodResource, MethodView):
     """""" 
     #@doc(description='Get specific item API.',tags=['Display Bucketlist item'],responses=None)  
     @marshal_with(ItemResponseSchema, code=200)

@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 from flask_migrate import Migrate
-from flask_restful import Api
 from flask_cors import CORS
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -9,7 +8,7 @@ from flask_apispec.extension import FlaskApiSpec
 
 from config import app_config
 from app.models import db
-from app import resources
+from app.resources import UserRegistration, UserLogin, BucketListAPI, BucketListItemAPI, AllUsers
 
 #use the config from the environment file as default
 config_name = os.getenv('FLASK_ENV')
@@ -29,7 +28,6 @@ app.config.from_object(app_config['development'])
 
 db.init_app(app)
 migrate = Migrate(app, db)
-api = Api(app)
 # docs = FlaskApiSpec(app)
 
 #Enable CORS support
@@ -41,11 +39,11 @@ def after_request(response):
     return response
 
 #Register endpoint inside our application
-api.add_resource(resources.UserRegistration, '/registration')
-api.add_resource(resources.UserLogin, '/login')
-api.add_resource(resources.AllUsers, '/users')
-api.add_resource(resources.BucketListAPI, '/bucketlist')
-api.add_resource(resources.BucketListItemAPI, '/bucketlist/<int:id>')
+app.add_url_rule('/registration',view_func=UserRegistration.as_view('registration'))
+app.add_url_rule('/login', view_func=UserLogin.as_view('login'))
+app.add_url_rule('/users', view_func=AllUsers.as_view('users'))
+app.add_url_rule('/bucketlist', view_func=BucketListAPI.as_view('bucketlist'))
+app.add_url_rule('/bucketlist/<int:id>', view_func=BucketListItemAPI.as_view('bucketlistitem'))
 
 # docs.register(resources.UserRegistration)
 # docs.register(resources.UserLogin)
