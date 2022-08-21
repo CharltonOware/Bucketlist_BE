@@ -7,7 +7,7 @@ from app.schema import UserResponseSchema, ItemResponseSchema
 #Define UserRegistration endpoint
 class UserRegistration(MethodResource,Resource):
     #Document API endpoint
-    @doc(description='Register User API.',tags=['Register'],responses=None)
+    #@doc(description='Register User API.',tags=['Register'],responses=None)
     #Define fields
     @use_kwargs(UserResponseSchema(), location='json')
     #Encode user data
@@ -25,11 +25,12 @@ class UserRegistration(MethodResource,Resource):
             return {'message': f'New user {new_user.email} created'}
         except:
             return {'message': 'Something went wrong'}, 500
+        
 
 #Define UserLogin endpoint
 class UserLogin(MethodResource, Resource):
-    @doc(description='Login User API.',tags=['Login'],responses=None)
-    @use_kwargs(UserResponseSchema, location='json')
+    #@doc(description='Login User API.',tags=['Login'],responses=None)
+    @use_kwargs(UserResponseSchema(), location='json')
     @marshal_with(UserResponseSchema(), code=200)
     def post(self, **kwargs):
         email = kwargs.get('email')
@@ -51,14 +52,14 @@ class AllUsers(MethodResource, Resource):
 
 #Define BucketListAPI resource for viewing and creating
 class BucketListAPI(MethodResource, Resource):
-    @doc(description='Get Bucketlist Items API.',tags=['Display Bucketlist'],responses=None)
+    #@doc(description='Get Bucketlist Items API.',tags=['Display Bucketlist'],responses=None)
     @marshal_with(ItemResponseSchema(many=True), code=200)
     def get(self):
         """Get all bucketlist items created by the current user."""
         bucketlist = BucketList.query.order_by(BucketList.id).all()
         return bucketlist
     
-    @doc(description='Create Bucketlist Item API.',tags=['Create Bucketlist item'],responses=None)
+    #@doc(description='Create Bucketlist Item API.',tags=['Create Bucketlist item'],responses=None)
     @use_kwargs(ItemResponseSchema(), location='json')
     @marshal_with(ItemResponseSchema(), code=201)
     def post(self, **kwargs):
@@ -80,7 +81,7 @@ class BucketListAPI(MethodResource, Resource):
 #Define BucketListItemAPI that has show, update and delete capability implemented
 class BucketListItemAPI(MethodResource, Resource):
     """""" 
-    @doc(description='Get specific item API.',tags=['Display Bucketlist item'],responses=None)  
+    #@doc(description='Get specific item API.',tags=['Display Bucketlist item'],responses=None)  
     @marshal_with(ItemResponseSchema, code=200)
     def get(self, id):
         """Get bucketlist item of the specified id."""
@@ -89,7 +90,7 @@ class BucketListItemAPI(MethodResource, Resource):
             return {'message': f'Item {item.name} doesn\'t exist'}, 400
         return item
     
-    @doc(description='Update specific item API.',tags=['Update Bucketlist item'],responses=None)
+    #@doc(description='Update specific item API.',tags=['Update Bucketlist item'],responses=None)
     @use_kwargs(ItemResponseSchema(), location='json')
     @marshal_with(ItemResponseSchema(), code=200)
     def patch(self, id, **kwargs):
@@ -101,7 +102,7 @@ class BucketListItemAPI(MethodResource, Resource):
 
         return item
 
-    @doc(description='Delete item API.',tags=['Delete bucketlist item'],responses=None)
+    #@doc(description='Delete item API.',tags=['Delete bucketlist item'],responses=None)
     def delete(self, id):
         """Delete the specified Bucketlist item."""
         item = BucketList.query.filter_by(id=id).first_or_none()
