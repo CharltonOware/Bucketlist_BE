@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import ForeignKey
 
 db = SQLAlchemy()
 
@@ -12,7 +13,7 @@ class UserModel(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     bucketlists = db.relationship(
-        'BucketList', backref='user',lazy='dynamic', order_by='BucketList.id', cascade="all, delete-orphan")
+        'BucketList', backref='user',lazy=True, passive_deletes=True)
 
     #Initialize an instance of UserModel
     def __init__(self, email, password):
@@ -67,7 +68,7 @@ class BucketList(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
             onupdate=db.func.current_timestamp())
     done = db.Column(db.Boolean, default=False)
-    created_by = db.column(db.Integer, db.ForeignKey("users.id"))
+    created_by = db.Column(db.Integer, ForeignKey('users.id',ondelete='CASCADE'))
 
     #Initialize an instance of BucketList model
     def __init__(self, name, created_by):
