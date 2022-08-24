@@ -85,7 +85,7 @@ class BucketListItemAPI(MethodResource, MethodView):
     @marshal_with(ItemResponseSchema, code=200)
     def get(self, id):
         """Get bucketlist item of the specified id."""
-        item = BucketList.query.filter_by(id=id).first_or_none()
+        item = BucketList.query.filter_by(id=id).one_or_none()
         if not item:
             return {'message': f'Item {item.name} doesn\'t exist'}, 400
         return item
@@ -95,7 +95,7 @@ class BucketListItemAPI(MethodResource, MethodView):
     @marshal_with(ItemResponseSchema(), code=200)
     def patch(self, id, **kwargs):
         """Update the specified Bucketlist item."""
-        item = BucketList.query.filter_by(id=id).first_or_none()
+        item = BucketList.query.filter_by(id=id).one_or_none()
         item.name = kwargs['name']
         item.done = kwargs['done']
         item.save_to_db()
@@ -105,7 +105,7 @@ class BucketListItemAPI(MethodResource, MethodView):
     #@doc(description='Delete item API.',tags=['Delete bucketlist item'],responses=None)
     def delete(self, id):
         """Delete the specified Bucketlist item."""
-        item = BucketList.query.filter_by(id=id).first_or_none()
+        item = BucketList.query.filter_by(id=id).one_or_none()
         if item:
             item.delete()
             return {'message': f'Item {item.id} deleted.'}, 204
