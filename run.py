@@ -15,6 +15,8 @@ config_name = os.getenv('FLASK_ENV')
 app = Flask(__name__)
 #configure app from an object in config file
 app.config.from_object(app_config['development'])
+#introduce app secret key
+app.config['SECRET_KEY'] = os.urandom(12).hex()
 # app.config.update({
 #     'APISPEC_SPEC': APISpec(
 #         title='Bucketlist Project',
