@@ -59,6 +59,28 @@ def get_token_auth_header():
     return token
 
 '''
+Implement check_permissions(permission, payload) method
+    @INPUTS
+        permission: string permission (i.e post:bucketlist)
+        payload: decoded jwt payload
+
+    it should raise an AuthError if permissions are not included in the payload. i.e RBAC should be set in Auth0
+    it should raise an AuthError if the requested permission string is not in the payload permissions array, otherwise returns true
+'''
+def check_permissions(permission, payload):
+    if 'permissions' not in payload:
+        raise AuthError({
+            'code': 'invalid_claims',
+            'description': 'Permissions not included in JWT'
+        }, 400)
+    if permission not in payload['permissions']:
+        raise AuthError({
+            'code': 'unauthorized',
+            'description': 'Permission not found.'
+        }, 403)
+    return True
+
+'''
 Implement verify_decode_jwt(token) method
 @INPUTS
     token: a json web token (string)
