@@ -18,5 +18,5 @@ class ItemResponseSchema(Schema):
     name = fields.String(required=True)
     date_created = fields.DateTime()
     date_modified = fields.DateTime()
-    created_by = fields.Nested(lambda: "UserResponseSchema", only=("id","email,"))
+    created_by = fields.Nested(lambda: "UserResponseSchema", only=("id","email"))
     done = fields.Boolean(default=False)

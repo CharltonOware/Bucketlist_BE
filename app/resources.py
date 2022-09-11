@@ -2,6 +2,7 @@ from flask.views import MethodView
 from flask_apispec import marshal_with, use_kwargs, MethodResource, doc
 from app.models import UserModel,BucketList
 from app.schema import UserResponseSchema, ItemResponseSchema
+from app.auth import requires_auth
 
 
 #Define UserRegistration endpoint
@@ -44,7 +45,9 @@ class UserLogin(MethodResource, MethodView):
 
 #Define view for all users
 class AllUsers(MethodResource, MethodView):
-    def get(self):
+    #Validate claims and check requested permissions
+    @requires_auth('get:users')
+    def get(self,payload):
         return UserModel.return_all()
 
     def delete(self):
@@ -62,14 +65,16 @@ class BucketListAPI(MethodResource, MethodView):
     #@doc(description='Create Bucketlist Item API.',tags=['Create Bucketlist item'],responses=None)
     @use_kwargs(ItemResponseSchema(), location='json')
     @marshal_with(ItemResponseSchema(), code=201)
-    def post(self, **kwargs):
+    #Validate claims and check requested permissions
+    @requires_auth('post:bucketlist')
+    def post(self, payload, **kwargs):
         name = kwargs['name']
         #Confirm name is in the request parameters
         if name:
             #Abort if provided bucketlist name already exists for this user in the DB
             if BucketList.find_by_name(name):
                 return {'message': f'An item with the name {name} already exists.'}
-            bucketlist = BucketList(name=name, created_by='Placeholder')
+            bucketlist = BucketList(name=name, created_by=1)
             try:
                 bucketlist.save_to_db()
                 return {'message': f'New item {name} created.'}
@@ -93,9 +98,10 @@ class BucketListItemAPI(MethodResource, MethodView):
     #@doc(description='Update specific item API.',tags=['Update Bucketlist item'],responses=None)
     @use_kwargs(ItemResponseSchema(), location='json')
     @marshal_with(ItemResponseSchema(), code=200)
-    def patch(self, id, **kwargs):
+    @requires_auth('patch:bucketlist')
+    def patch(self,payload, **kwargs):
         """Update the specified Bucketlist item."""
-        item = BucketList.query.filter_by(id=id).one_or_none()
+        item = BucketList.query.filter_by(id=kwargs['id']).one_or_none()
         item.name = kwargs['name']
         item.done = kwargs['done']
         item.save_to_db()
@@ -103,7 +109,8 @@ class BucketListItemAPI(MethodResource, MethodView):
         return item
 
     #@doc(description='Delete item API.',tags=['Delete bucketlist item'],responses=None)
-    def delete(self, id):
+    @requires_auth('delete:bucketlist')
+    def delete(self,payload,id):
         """Delete the specified Bucketlist item."""
         item = BucketList.query.filter_by(id=id).one_or_none()
         if item:

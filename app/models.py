@@ -82,7 +82,7 @@ class BucketList(db.Model):
     @classmethod
     def find_by_name(cls, name):
         #Return all bucketlist items with names matching the search name
-        return cls.query.order_by(cls.id).filter_by(cls.name.ilike('%{name}%')).first()
+        return cls.query.filter_by(name=name).first()
 
     @staticmethod
     def get_all(user_id):
@@ -90,7 +90,7 @@ class BucketList(db.Model):
         return BucketList.query.filter_by(created_by=user_id)
 
     def delete(self):
-        db.session.add(self)
+        db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):
