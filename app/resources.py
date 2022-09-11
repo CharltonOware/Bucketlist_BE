@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from webargs.flaskparser import use_kwargs
-from flask_apispec import marshal_with, use_kwargs, MethodResource, doc
+from flask_apispec import marshal_with,MethodResource, doc
 from app.models import UserModel,BucketList
 from app.schema import UserResponseSchema, ItemResponseSchema
 from app.auth import requires_auth
@@ -9,7 +9,7 @@ from app.auth import requires_auth
 #Define UserRegistration endpoint
 class UserRegistration(MethodResource,MethodView):
     #Document API endpoint
-    #@doc(description='Register User API.',tags=['Register'],responses=None)
+    @doc(description='Register User API.',tags=['Register'],responses=None)
     #Define fields
     @use_kwargs(UserResponseSchema(), location='json')
     #Encode user data
@@ -31,7 +31,7 @@ class UserRegistration(MethodResource,MethodView):
 
 #Define UserLogin endpoint
 class UserLogin(MethodResource, MethodView):
-    #@doc(description='Login User API.',tags=['Login'],responses=None)
+    @doc(description='Login User API.',tags=['Login'],responses=None)
     @use_kwargs(UserResponseSchema(), location='json')
     @marshal_with(UserResponseSchema(), code=200)
     def post(self, **kwargs):
@@ -56,14 +56,14 @@ class AllUsers(MethodResource, MethodView):
 
 #Define BucketListAPI resource for viewing and creating
 class BucketListAPI(MethodResource, MethodView):
-    #@doc(description='Get Bucketlist Items API.',tags=['Display Bucketlist'],responses=None)
+    @doc(description='Get Bucketlist Items API.',tags=['Display Bucketlist'],responses=None)
     @marshal_with(ItemResponseSchema(many=True), code=200)
     def get(self):
         """Get all bucketlist items created by the current user."""
         bucketlist = BucketList.query.order_by(BucketList.id).all()
         return bucketlist
     
-    #@doc(description='Create Bucketlist Item API.',tags=['Create Bucketlist item'],responses=None)
+    @doc(description='Create Bucketlist Item API.',tags=['Create Bucketlist item'],responses=None)
     @use_kwargs(ItemResponseSchema(), location='json')
     @marshal_with(ItemResponseSchema(), code=201)
     #Validate claims and check requested permissions
@@ -87,7 +87,7 @@ class BucketListAPI(MethodResource, MethodView):
 #Define BucketListItemAPI that has show, update and delete capability implemented
 class BucketListItemAPI(MethodResource, MethodView):
     """""" 
-    #@doc(description='Get specific item API.',tags=['Display Bucketlist item'],responses=None)  
+    @doc(description='Get specific item API.',tags=['Display Bucketlist item'],responses=None)  
     @marshal_with(ItemResponseSchema, code=200)
     def get(self, id):
         """Get bucketlist item of the specified id."""
@@ -96,7 +96,7 @@ class BucketListItemAPI(MethodResource, MethodView):
             return {'message': f'Item {item.name} doesn\'t exist'}, 400
         return item
     
-    #@doc(description='Update specific item API.',tags=['Update Bucketlist item'],responses=None)
+    @doc(description='Update specific item API.',tags=['Update Bucketlist item'],responses=None)
     @use_kwargs(ItemResponseSchema(), location='json')
     @marshal_with(ItemResponseSchema(), code=200)
     @requires_auth('patch:bucketlist')
@@ -109,7 +109,7 @@ class BucketListItemAPI(MethodResource, MethodView):
 
         return item
 
-    #@doc(description='Delete item API.',tags=['Delete bucketlist item'],responses=None)
+    @doc(description='Delete item API.',tags=['Delete bucketlist item'],responses=None)
     @requires_auth('delete:bucketlist')
     def delete(self,payload,id):
         """Delete the specified Bucketlist item."""

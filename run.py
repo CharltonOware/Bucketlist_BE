@@ -17,20 +17,20 @@ app = Flask(__name__)
 app.config.from_object(app_config['development'])
 #introduce app secret key
 app.config['SECRET_KEY'] = os.urandom(12).hex()
-# app.config.update({
-#     'APISPEC_SPEC': APISpec(
-#         title='Bucketlist Project',
-#         version='1.0.0',
-#         plugins=[MarshmallowPlugin()],
-#         openapi_version='2.0.0'
-#     ),
-#     'APISPEC_SWAGGER_URL': '/swagger/', #URI to access API Doc JSON
-#     'APISPEC_SWAGGER_UI_URL': '/swagger-ui/' #URI to access UI of API Doc
-# })
+app.config.update({
+    'APISPEC_SPEC': APISpec(
+        title='Bucketlist Project',
+        version='1.0.0',
+        plugins=[MarshmallowPlugin()],
+        openapi_version='2.0.0'
+    ),
+    'APISPEC_SWAGGER_URL': '/swagger/', #URI to access API Doc JSON
+    'APISPEC_SWAGGER_UI_URL': '/swagger-ui/' #URI to access UI of API Doc
+ })
 
 db.init_app(app)
 migrate = Migrate(app, db)
-# docs = FlaskApiSpec(app)
+docs = FlaskApiSpec(app)
 
 #Enable CORS support
 CORS(app)
@@ -47,7 +47,7 @@ app.add_url_rule('/users', view_func=AllUsers.as_view('users'))
 app.add_url_rule('/bucketlist', view_func=BucketListAPI.as_view('bucketlist'))
 app.add_url_rule('/bucketlist/<int:id>', view_func=BucketListItemAPI.as_view('bucketlistitem'))
 
-# docs.register(resources.UserRegistration)
-# docs.register(resources.UserLogin)
-# docs.register(resources.BucketListAPI)
-# docs.register(resources.BucketListItemAPI)
+docs.register(UserRegistration, endpoint='registration')
+docs.register(UserLogin, endpoint='login')
+docs.register(BucketListAPI, endpoint='bucketlist')
+docs.register(BucketListItemAPI, endpoint='bucketlistitem')
